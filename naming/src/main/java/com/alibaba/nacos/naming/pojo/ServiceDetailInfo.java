@@ -40,11 +40,20 @@ public class ServiceDetailInfo implements Serializable {
     private Map<String, ClusterInfo> clusterMap;
     
     private Map<String, String> metadata;
-    
+
+    /**
+     * 健康保护阈值
+     */
     private float protectThreshold;
-    
+
+    /**
+     * 实例选择器
+     */
     private Selector selector;
-    
+
+    /**
+     * 拓展数据(
+     */
     private Boolean ephemeral;
     
     /**
