@@ -246,6 +246,7 @@ public class LongPollingService {
         int delayTime = SwitchService.getSwitchInteger(SwitchService.FIXED_DELAY_TIME, 500);
         
         // Add delay time for LoadBalance, and one response is returned 500 ms in advance to avoid client timeout.
+        // 为负载均衡添加延迟时间，同时为了避免客户端超时，在实际超时之前提前500毫秒返回一个响应。
         long timeout = -1L;
         if (isFixedPolling()) {
             timeout = Math.max(10000, getFixedPollingInterval());
@@ -275,13 +276,16 @@ public class LongPollingService {
         }
         
         // Must be called by http thread, or send response.
+        // 一定要由HTTP线程调用，否则离开后容器会立即发送响应
         final AsyncContext asyncContext = req.startAsync();
         
         // AsyncContext.setTimeout() is incorrect, Control by oneself
+        // AsyncContext.setTimeout()的超时时间不准，所以只能自己控制
         asyncContext.setTimeout(0L);
         
         String appName = req.getHeader(RequestUtil.CLIENT_APPNAME_HEADER);
         String tag = req.getHeader("Vipserver-Tag");
+        // 创建ClientLongPolling，然后提交到scheduler定时线程池执行
         ConfigExecutor.executeLongPolling(
                 new ClientLongPolling(asyncContext, clientMd5Map, ip, probeRequestSize, timeout, appName, tag));
     }
